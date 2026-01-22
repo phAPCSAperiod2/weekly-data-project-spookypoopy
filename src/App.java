@@ -14,7 +14,7 @@ public class App {
         System.out.println("===== WEEKLY STEP COUNTER =====\n");
 
         // ----- STEP 1: Get the user's daily goal -----
-        System.out.print("Enter your daily step goal (default 10000): ");
+        System.out.print("Enter your daily step goal (healthy goal 10,000): ");
         
         // Set default goal to 10,000 steps
         double goal = 10000;

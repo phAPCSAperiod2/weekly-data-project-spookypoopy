@@ -9,10 +9,21 @@ public class WeeklyData {
     private double dailyGoal;       // Stores the user's daily step goal
 
     /**
-     * Constructor: Takes in an array of step data and a daily goal.
+     * Constructor with default goal: Takes in an array of step data.
+     * Uses a default daily goal of 10,000 steps.
      * Makes a COPY of the input array (deep copy) to protect the original data.
      * 
-     * @param input The array of 7 days of steps
+     * @param input The array of step data
+     */
+    public WeeklyData(double[] input) {
+        this(input, 10000.0);  // Call the other constructor with default goal
+    }
+
+    /**
+     * Constructor with custom goal: Takes in an array of step data and a daily goal.
+     * Makes a COPY of the input array (deep copy) to protect the original data.
+     * 
+     * @param input The array of step data
      * @param goal The user's daily step goal
      */
     public WeeklyData(double[] input, double goal) {
@@ -126,12 +137,40 @@ public class WeeklyData {
             // Check if this day's steps met the goal
             String check = (data[i] >= dailyGoal) ? " ✓" : "";
             
-            // Add this day's info to the result
-            // (i + 1) because days are numbered 1-7, not 0-6
-            // (int) converts the double to an integer for cleaner display
-            result += "Day " + (i + 1) + ": " + (int)data[i] + check + "\n";
+            // Add this day's info to the result with comma formatting
+            // String.format("%,.0f", data[i]) formats numbers with commas
+            // Example: 1000.0 becomes "1,000"
+            result += "Day " + (i + 1) + ": " + String.format("%,.0f", data[i]) + check + "\n";
         }
         
         return result;
+    }
+
+    /**
+     * Returns the daily step goal.
+     * 
+     * @return The daily goal
+     */
+    public double getDailyGoal() {
+        return dailyGoal;
+    }
+
+    /**
+     * Counts how many days the goal was met.
+     * 
+     * @return The number of days where steps >= goal
+     */
+    public int getDaysGoalMet() {
+        int count = 0;  // Start count at 0
+        
+        // Loop through each day in the data array
+        for (int i = 0; i < data.length; i++) {
+            // If this day met or exceeded the goal, increment count
+            if (data[i] >= dailyGoal) {
+                count++;
+            }
+        }
+        
+        return count;
     }
 }
