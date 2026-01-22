@@ -6,7 +6,7 @@
 
 ## 📌 Project Overview
 
-In this project, you will design and build a **Weekly Data Analyzer** in Java. Your program will allow a user to enter **7 days of data** for something meaningful to them—such as steps taken, hours of sleep, money spent, mood ratings, screen time, or another approved idea.
+In this project, you will design and build a **Daily Step Counter** in Java. Your program will allow a user to enter a variable number of days of step data, set a daily goal, and track progress towards both personal and global goals (10,000 steps per day average).
 
 Your program will store this data in an **array**, analyze it using **array algorithms**, and present useful results to the user. You will apply **object-oriented programming (OOP)** principles by creating a custom data class that encapsulates both the data and the logic used to analyze it.
 
@@ -200,5 +200,6 @@ You must:
   - Your chosen project theme  
   - A short description of your program
 
-
-
+**Name:** [Your Name Here]  
+**Chosen Project Theme:** Daily Step Counter  
+**Short Description:** This program allows users to input the number of days they want to track steps for, set a personal daily goal, and receive daily updates on whether they met their goal and if their current average meets the global goal of 10,000 steps per day. At the end, it provides a summary with total, average, min, max steps, and motivational insights.

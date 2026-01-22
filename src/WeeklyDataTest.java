@@ -100,4 +100,77 @@ class WeeklyDataTest {
     }
 
     @Test
-    v
+    void getMax_singleValue() {
+        double[] input = {42.0};
+        WeeklyData wd = new WeeklyData(input);
+
+        assertEquals(42.0, wd.getMax(), 1e-9);
+    }
+
+    // -------------------------------------------------
+    // getMin Tests
+    // -------------------------------------------------
+    @Test
+    void getMin_typicalValues() {
+        double[] input = {10, 50, 30, 75, 25};
+        WeeklyData wd = new WeeklyData(input);
+
+        assertEquals(10.0, wd.getMin(), 1e-9);
+    }
+
+    @Test
+    void getMin_singleValue() {
+        double[] input = {42.0};
+        WeeklyData wd = new WeeklyData(input);
+
+        assertEquals(42.0, wd.getMin(), 1e-9);
+    }
+
+    // -------------------------------------------------
+    // toString Tests
+    // -------------------------------------------------
+    @Test
+    void toString_formatsCorrectly() {
+        double[] input = {1000, 2000, 3000};
+        WeeklyData wd = new WeeklyData(input, 1500);
+
+        String expected = "Day 1: 1,000 ✓\nDay 2: 2,000 ✓\nDay 3: 3,000 ✓\n";
+        assertEquals(expected, wd.toString());
+    }
+
+    @Test
+    void toString_noGoalsMet() {
+        double[] input = {500, 1000};
+        WeeklyData wd = new WeeklyData(input, 1500);
+
+        String expected = "Day 1: 500\nDay 2: 1,000\n";
+        assertEquals(expected, wd.toString());
+    }
+
+    // -------------------------------------------------
+    // getDaysGoalMet Tests
+    // -------------------------------------------------
+    @Test
+    void getDaysGoalMet_allMet() {
+        double[] input = {1500, 2000, 2500};
+        WeeklyData wd = new WeeklyData(input, 1000);
+
+        assertEquals(3, wd.getDaysGoalMet());
+    }
+
+    @Test
+    void getDaysGoalMet_noneMet() {
+        double[] input = {500, 600};
+        WeeklyData wd = new WeeklyData(input, 1000);
+
+        assertEquals(0, wd.getDaysGoalMet());
+    }
+
+    @Test
+    void getDaysGoalMet_someMet() {
+        double[] input = {500, 1500, 2000, 300};
+        WeeklyData wd = new WeeklyData(input, 1000);
+
+        assertEquals(2, wd.getDaysGoalMet());
+    }
+}
