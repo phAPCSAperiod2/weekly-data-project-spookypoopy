@@ -1,6 +1,12 @@
 /**
  * The WeeklyData class stores and analyzes 7 days of step data.
  * It provides methods to calculate total, average, max, and min steps.
+ * 
+ * This class encapsulates data storage and analysis methods for tracking
+ * daily step counts against a user-defined daily goal.
+ * 
+ * @author Jacob Le
+ * @version 1.0
  */
 public class WeeklyData {
 
@@ -150,6 +156,11 @@ public class WeeklyData {
      * Returns the daily step goal.
      * 
      * @return The daily goal
+     */
+    /**
+     * Returns the daily step goal.
+     * 
+     * @return The daily goal in steps
      */
     public double getDailyGoal() {
         return dailyGoal;
