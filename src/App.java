@@ -1,167 +1,153 @@
 import java.util.Scanner;
+import java.util.Random;
 
 /**
- * Weekly Step Counter Application
- * Allows users to enter daily steps for a week, set a goal, and see analysis results.
+ * Weekly Step Counter Application (refactored)
+ * - Extracts input and output into helper methods
+ * - Adds a small compliments feature for personalized encouragement
  * 
- * This application provides an interactive interface for users to:
- * - Set a custom daily step goal (default 10,000 steps)
- * - Track steps for a variable number of days
- * - Receive instant daily feedback
- * - View weekly analysis and personalized encouragement
- * 
+ * Behavior is preserved; the code is just cleaner and easier to read.
+ *
  * @author Jacob Le
- * @version 1.0
+ * @version 1.1
  */
 public class App {
 
     public static void main(String[] args) {
-        // Create a Scanner to read user input from the keyboard
-        Scanner scanner = new Scanner(System.in);
+        try (Scanner scanner = new Scanner(System.in)) {
+            System.out.println("===== WEEKLY STEP COUNTER =====\n");
 
-        // Display a welcome message
-        System.out.println("===== WEEKLY STEP COUNTER =====\n");
+            double goal = promptDailyGoal(scanner);
+            int numDays = promptNumDays(scanner);
 
-        // ----- STEP 1: Get the user's daily goal -----
+            double[] steps = collectSteps(scanner, numDays, goal);
+
+            WeeklyData data = new WeeklyData(steps, goal);
+
+            printSummary(data);
+            printFeedback(data, numDays);
+        }
+    }
+
+    // ----- Input helpers -----
+    private static double promptDailyGoal(Scanner scanner) {
         System.out.print("Enter your daily step goal (healthy goal 10,000): ");
-        
-        // Set default goal to 10,000 steps
-        double goal = 10000;
-        
-        // Check if user entered a valid number
+        double defaultGoal = 10000.0;
+
         if (scanner.hasNextDouble()) {
-            double input = scanner.nextDouble();  // Read the input
-            
-            // Only update goal if input is positive (no negative goals!)
-            if (input > 0) {
-                goal = input;
-            }
+            double input = scanner.nextDouble();
+            scanner.nextLine(); // consume rest of line
+            if (input > 0) return input;
+        } else {
+            scanner.nextLine(); // clear bad input
         }
-        
-        // Clear the rest of the line (important for Scanner)
-        scanner.nextLine();
-        
-        // Display the goal that will be used
-        System.out.println("Goal: " + (int)goal + " steps\n");
 
-        // ----- STEP 2: Ask how many days to track -----
+        System.out.println("Goal: " + (int)defaultGoal + " steps\n");
+        return defaultGoal;
+    }
+
+    private static int promptNumDays(Scanner scanner) {
         System.out.print("How many days do you want to track? (default 7): ");
-        
-        // Set default to 7 days
-        int numDays = 7;
-        
-        // Check if user entered a valid number
-        if (scanner.hasNextInt()) {
-            int input = scanner.nextInt();  // Read the input
-            
-            // Only update numDays if input is positive
-            if (input > 0) {
-                numDays = input;
-            }
-        }
-        
-        // Clear the rest of the line (important for Scanner)
-        scanner.nextLine();
-        
-        System.out.println("Tracking " + numDays + " days\n");
+        int defaultDays = 7;
 
-        // ----- STEP 3: Create an array to store step data -----
-        // Create array size based on user's choice
+        if (scanner.hasNextInt()) {
+            int input = scanner.nextInt();
+            scanner.nextLine(); // consume rest of line
+            if (input > 0) return input;
+        } else {
+            scanner.nextLine(); // clear bad input
+        }
+
+        System.out.println("Tracking " + defaultDays + " days\n");
+        return defaultDays;
+    }
+
+    // ----- Data collection -----
+    private static double[] collectSteps(Scanner scanner, int numDays, double goal) {
         double[] steps = new double[numDays];
 
-        // ----- STEP 4: Collect step data for each day -----
-        // Loop for however many days the user chose
         for (int day = 1; day <= numDays; day++) {
-            // Use a while loop to validate the input
-            boolean valid = false;  // Flag to track if input is valid
-            
-            while (!valid) {  // Keep asking until we get a valid number
-                System.out.print("Day " + day + " - Enter steps: ");
-                
-                // Check if user entered a number
-                if (scanner.hasNextDouble()) {
-                    double value = scanner.nextDouble();  // Read the number
-                    
-                    // Make sure the number is not negative
-                    if (value >= 0) {
-                        // Store in array (day-1 because array starts at 0, not 1)
-                        steps[day - 1] = value;
-                        valid = true;  // Exit the while loop
-                        
-                        // ----- Display per-day feedback -----
-                        // Give instant feedback based on whether they met today's goal
-                        if (value >= goal) {
-                            System.out.println("   ✓ Great job! You met your goal for today! 💪");
-                        } else {
-                            double remaining = goal - value;
-                            System.out.println("   You need " + (int)remaining + " more steps to reach your goal. Keep going!");
-                        }
-                        System.out.println();  // Add blank line for readability
-                        
-                    } else {
-                        // Tell user they entered a negative number
-                        System.out.println("Please enter a positive number.");
-                    }
-                } else {
-                    // User didn't enter a number
-                    System.out.println("Please enter a valid number.");
-                    scanner.nextLine();  // Clear the bad input
-                }
+            double value = readNonNegativeDouble(scanner, "Day " + day + " - Enter steps: ");
+            steps[day - 1] = value;
+
+            if (value >= goal) {
+                System.out.println("   ✓ Great job! You met your goal for today! 💪\n");
+            } else {
+                System.out.println("   You need " + (int)(goal - value) + " more steps to reach your goal. Keep going!\n");
             }
         }
 
-        // ----- STEP 5: Create a WeeklyData object to analyze the data -----
-        // Pass the steps array and the goal to the WeeklyData constructor
-        WeeklyData data = new WeeklyData(steps, goal);
+        return steps;
+    }
 
-        // ----- STEP 6: Display the results -----
+    private static double readNonNegativeDouble(Scanner scanner, String prompt) {
+        while (true) {
+            System.out.print(prompt);
+            if (scanner.hasNextDouble()) {
+                double value = scanner.nextDouble();
+                scanner.nextLine(); // consume rest of line
+                if (value >= 0) return value;
+                System.out.println("Please enter a positive number.");
+            } else {
+                System.out.println("Please enter a valid number.");
+                scanner.nextLine(); // clear bad input
+            }
+        }
+    }
+
+    // ----- Output helpers -----
+    private static void printSummary(WeeklyData data) {
         System.out.println("\n===== RESULTS =====\n");
-        
-        // Display summary statistics
         System.out.println("Total Steps: " + (int)data.getTotal());
         System.out.println("Average: " + String.format("%.0f", data.getAverage()));
         System.out.println("Highest Day: " + (int)data.getMax());
         System.out.println("Lowest Day: " + (int)data.getMin());
-
-        // Display all 7 days using toString() method
-        // The toString() method handles formatting and checkmarks automatically
         System.out.println("\n" + data.toString());
+    }
 
-        // ----- STEP 7: Display personalized feedback and encouragement -----
-        int daysMetGoal = data.getDaysGoalMet();  // Get the number of days goal was met
-        
+    private static void printFeedback(WeeklyData data, int numDays) {
+        int daysMetGoal = data.getDaysGoalMet();
+
         System.out.println("===== FEEDBACK =====\n");
-        System.out.println("Goal Achievement: " + daysMetGoal + " out of " + numDays + " days");
-        System.out.println();
-        
-        // Display encouraging message based on performance
+        System.out.println("Goal Achievement: " + daysMetGoal + " out of " + numDays + " days\n");
+
+        // Core message
         if (daysMetGoal == numDays) {
             System.out.println("🎉 INCREDIBLE! You crushed it!");
             System.out.println("You met your goal every single day this week!");
-            System.out.println("You are a step counter champion! Keep this amazing streak going!");
         } else if (daysMetGoal >= 5) {
             System.out.println("⭐ EXCELLENT! You had an awesome week!");
-            System.out.println("You met your goal " + daysMetGoal + " out of 7 days!");
-            System.out.println("You're so close to perfection. One more push next week!");
+            System.out.println("You met your goal " + daysMetGoal + " out of " + numDays + " days!");
         } else if (daysMetGoal >= 3) {
             System.out.println("👍 GOOD EFFORT! You're making progress!");
             System.out.println("You met your goal " + daysMetGoal + " days this week.");
-            System.out.println("Keep building that momentum. You're on the right track!");
         } else if (daysMetGoal >= 1) {
             System.out.println("💪 NICE START! You're getting there!");
             System.out.println("You met your goal " + daysMetGoal + " day(s) this week.");
-            System.out.println("Every step counts. Push harder next week!");
         } else {
             System.out.println("🌟 KEEP TRYING! You've got this!");
             System.out.println("You didn't reach your goal this week, but that's okay!");
-            System.out.println("Next week is a fresh start. Let's go get those steps!");
         }
-        
+
+        // Add a short random compliment to finish
+        System.out.println();
+        System.out.println(getRandomCompliment());
+
         System.out.println();
         System.out.println("Next week's goal: Beat your best day of " + (int)data.getMax() + " steps!");
         System.out.println();
+    }
 
-        // Close the Scanner to prevent resource leaks
-        scanner.close();
+    private static String getRandomCompliment() {
+        String[] compliments = {
+            "Nice work — your effort is paying off! ✨",
+            "You're doing great — keep that energy up! 🔥",
+            "Small steps lead to big wins — proud of you! 💯",
+            "You're consistent and it's showing — way to go! 🌟",
+            "Love the progress — keep stepping! 👏"
+        };
+
+        Random rnd = new Random();
+        return "Compliment: " + compliments[rnd.nextInt(compliments.length)];
     }
 }
